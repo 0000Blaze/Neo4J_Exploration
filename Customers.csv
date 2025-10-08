@@ -1,0 +1,4 @@
+customer_id,name,email,phone,loyalty_no
+1,John Doe,john@example.com,0411111111,LOY1001
+2,Jane Smith,jane@example.com,0422222222,LOY1002
+3,Sam Wilson,sam@example.com,0433333333,LOY1003

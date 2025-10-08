@@ -1,0 +1,4 @@
+from_warehouse,to_store,transfer_date
+1,1,2025-08-01
+2,2,2025-08-02
+3,3,2025-08-03

@@ -1,0 +1,4 @@
+so_id,so_number,store_id,customer_id,order_date,total_amount
+1,SO001,1,1,2025-08-05,300
+2,SO002,2,2,2025-08-06,1200
+3,SO003,3,3,2025-08-07,750

@@ -1,0 +1,5 @@
+po_id,product_id,quantity,unit_price
+1,1,50,42
+1,2,20,255
+2,3,10,810
+3,5,15,105

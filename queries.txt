@@ -1,0 +1,43 @@
+// ================================
+// queries.txt – Cypher Use Cases
+// ================================
+
+// -------------------------
+// Simple Query 1
+// -------------------------
+// Scenario: Find all products supplied by 'Global Traders'.
+// Business value: Procurement team can quickly see which products come from a specific supplier.
+MATCH (s:Supplier {name: 'Global Traders'})-[:SUPPLIES]->(p:Product)
+RETURN s.name AS Supplier, p.name AS Product, p.category AS Category;
+
+// -------------------------
+// Simple Query 2
+// -------------------------
+// Scenario: List all shipments (inventory entries) for products in 'Home Appliances' category.
+// Business value: Warehouse managers can track appliance stock.
+MATCH (p:Product {category: 'Home Appliances'})- [rel:STORED_IN]->(w:Warehouse)
+RETURN p.name AS Product, w.name AS Warehouse, rel.quantity AS Quantity;
+
+// -------------------------
+// Moderate Query (with outer join logic)
+// -------------------------
+// Scenario: Show each supplier and their total purchase order value (if any).
+// Business value: Helps finance see supplier spend, including suppliers with no current POs.
+MATCH (s:Supplier)
+OPTIONAL MATCH (s)-[:SUPPLIES]->(p:Product)<-[pol:CONTAINS]-(po:PurchaseOrder)
+RETURN s.name AS Supplier,
+       SUM(pol.quantity * pol.unit_price) AS TotalOrderValue
+ORDER BY TotalOrderValue DESC;
+
+// -------------------------
+// Complex Query (subqueries + aggregates)
+// -------------------------
+// Scenario: Identify the top-selling product(s) by quantity sold across all stores.
+// Business value: Sales team can prioritize restocking and promotions for high-demand products.
+MATCH (so:SalesOrder)-[line:CONTAINS]->(p:Product)
+WITH p, SUM(line.quantity) AS total_sold
+WITH MAX(total_sold) AS max_sold, COLLECT({product:p, qty:total_sold}) AS allSales
+UNWIND allSales AS record
+WITH record
+WHERE record.qty = max_sold
+RETURN record.product.name AS TopProduct, record.qty AS UnitsSold;

@@ -1,0 +1,6 @@
+supplier_id,name,contact_name,phone,email,address
+1,Global Traders,Alice Johnson,123-456-7890,alice@global.com,"12 King St, Sydney"
+2,Ocean Imports,Bob Smith,987-654-3210,bob@ocean.com,"45 Queen Rd, Melbourne"
+3,TechSource Ltd,Carol Lee,555-222-3333,carol@techsource.com,"88 Market St, Brisbane"
+4,Fresh Foods Supply,David Wang,444-111-2222,david@freshfoods.com,"77 Harbour Ave, Perth"
+5,Elite Electronics,Evelyn Brown,999-888-7777,evelyn@elite.com,"66 Collins St, Adelaide"

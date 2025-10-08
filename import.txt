@@ -1,0 +1,140 @@
+// ================================
+// Neo4j Import Script (import.txt)
+// ================================
+:auto USING PERIODIC COMMIT 1000
+
+// Clean database before import
+MATCH (n) DETACH DELETE n;
+
+// ----------------------
+// Create Supplier nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///Suppliers.csv' AS row
+CREATE (:Supplier {
+    supplier_id: row.supplier_id,
+    name: row.name,
+    contact_name: row.contact_name,
+    phone: row.phone,
+    email: row.email,
+    address: row.address
+});
+
+// ----------------------
+// Create Product nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///Products.csv' AS row
+CREATE (:Product {
+    product_id: row.product_id,
+    sku: row.sku,
+    name: row.name,
+    category: row.category,
+    cost_price: toFloat(row.cost_price),
+    retail_price: toFloat(row.retail_price)
+});
+
+// ----------------------
+// Create Warehouse nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///Warehouses.csv' AS row
+CREATE (:Warehouse {
+    warehouse_id: row.warehouse_id,
+    name: row.name,
+    location: row.location,
+    capacity: toInteger(row.capacity)
+});
+
+// ----------------------
+// Create Store nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///Stores.csv' AS row
+CREATE (:Store {
+    store_id: row.store_id,
+    name: row.name,
+    location: row.location,
+    manager: row.manager
+});
+
+// ----------------------
+// Create Customer nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///Customers.csv' AS row
+CREATE (:Customer {
+    customer_id: row.customer_id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    loyalty_no: row.loyalty_no
+});
+
+// ----------------------
+// Create PurchaseOrder nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///PurchaseOrders.csv' AS row
+CREATE (:PurchaseOrder {
+    po_id: row.po_id,
+    po_number: row.po_number,
+    order_date: date(row.order_date),
+    expected_date: date(row.expected_date),
+    status: row.status
+});
+
+// ----------------------
+// Create SalesOrder nodes
+// ----------------------
+LOAD CSV WITH HEADERS FROM 'file:///SalesOrders.csv' AS row
+CREATE (:SalesOrder {
+    so_id: row.so_id,
+    so_number: row.so_number,
+    order_date: date(row.order_date),
+    total_amount: toFloat(row.total_amount)
+});
+
+// ===================================================
+// Relationships
+// ===================================================
+
+// Supplier SUPPLIES Product
+LOAD CSV WITH HEADERS FROM 'file:///Products.csv' AS row
+MATCH (s:Supplier {supplier_id: row.default_supplier_id}), (p:Product {product_id: row.product_id})
+CREATE (s)-[:SUPPLIES]->(p);
+
+// PurchaseOrder SUPPLIES lines (PO CONTAINS Product)
+LOAD CSV WITH HEADERS FROM 'file:///POLines.csv' AS row
+MATCH (po:PurchaseOrder {po_id: row.po_id}), (p:Product {product_id: row.product_id})
+CREATE (po)-[:CONTAINS {quantity: toInteger(row.quantity), unit_price: toFloat(row.unit_price)}]->(p);
+
+// SalesOrder CONTAINS Product
+LOAD CSV WITH HEADERS FROM 'file:///SOLines.csv' AS row
+MATCH (so:SalesOrder {so_id: row.so_id}), (p:Product {product_id: row.product_id})
+CREATE (so)-[:CONTAINS {quantity: toInteger(row.quantity), unit_price: toFloat(row.unit_price)}]->(p);
+
+// Customer PLACED SalesOrder
+LOAD CSV WITH HEADERS FROM 'file:///SalesOrders.csv' AS row
+MATCH (c:Customer {customer_id: row.customer_id}), (so:SalesOrder {so_id: row.so_id})
+CREATE (c)-[:PLACED]->(so);
+
+// Store HANDLES SalesOrder
+LOAD CSV WITH HEADERS FROM 'file:///SalesOrders.csv' AS row
+MATCH (st:Store {store_id: row.store_id}), (so:SalesOrder {so_id: row.so_id})
+CREATE (st)-[:HANDLES]->(so);
+
+// Shipment STORED_IN Warehouse (simplified from Inventory)
+LOAD CSV WITH HEADERS FROM 'file:///Inventory.csv' AS row
+MATCH (w:Warehouse {warehouse_id: row.warehouse_id}), (p:Product {product_id: row.product_id})
+CREATE (p)-[:STORED_IN {quantity: toInteger(row.quantity)}]->(w);
+
+// Warehouse TRANSFERRED_TO Store
+LOAD CSV WITH HEADERS FROM 'file:///Transfers.csv' AS row
+MATCH (w:Warehouse {warehouse_id: row.from_warehouse}), (st:Store {store_id: row.to_store})
+CREATE (w)-[:TRANSFERRED_TO {transfer_date: date(row.transfer_date)}]->(st);
+
+// ===================================================
+// Indexes
+// ===================================================
+CREATE INDEX supplier_id_index IF NOT EXISTS FOR (s:Supplier) ON (s.supplier_id);
+CREATE INDEX product_id_index IF NOT EXISTS FOR (p:Product) ON (p.product_id);
+CREATE INDEX warehouse_id_index IF NOT EXISTS FOR (w:Warehouse) ON (w.warehouse_id);
+CREATE INDEX store_id_index IF NOT EXISTS FOR (st:Store) ON (st.store_id);
+CREATE INDEX customer_id_index IF NOT EXISTS FOR (c:Customer) ON (c.customer_id);
+CREATE INDEX po_id_index IF NOT EXISTS FOR (po:PurchaseOrder) ON (po.po_id);
+CREATE INDEX so_id_index IF NOT EXISTS FOR (so:SalesOrder) ON (so.so_id);

@@ -1,0 +1,4 @@
+warehouse_id,name,location,capacity
+1,Sydney Central WH,Sydney,1000
+2,Melbourne South WH,Melbourne,800
+3,Brisbane North WH,Brisbane,600

@@ -1,0 +1,6 @@
+product_id,sku,name,category,cost_price,retail_price,default_supplier_id
+1,P1001,Electric Heater,Home Appliances,40,75,1
+2,P1002,LED TV 42 inch,Electronics,250,450,5
+3,P1003,Gaming Laptop,Computers,800,1200,3
+4,P1004,Rice Cooker,Home Appliances,30,60,4
+5,P1005,Office Chair,Furniture,100,180,2
