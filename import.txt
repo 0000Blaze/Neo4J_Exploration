@@ -1,14 +1,7 @@
-// ================================
-// Neo4j Import Script (import.txt)
-// ================================
-:auto USING PERIODIC COMMIT 1000
-
 // Clean database before import
 MATCH (n) DETACH DELETE n;
 
-// ----------------------
 // Create Supplier nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///Suppliers.csv' AS row
 CREATE (:Supplier {
     supplier_id: row.supplier_id,
@@ -19,9 +12,7 @@ CREATE (:Supplier {
     address: row.address
 });
 
-// ----------------------
 // Create Product nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///Products.csv' AS row
 CREATE (:Product {
     product_id: row.product_id,
@@ -32,9 +23,7 @@ CREATE (:Product {
     retail_price: toFloat(row.retail_price)
 });
 
-// ----------------------
 // Create Warehouse nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///Warehouses.csv' AS row
 CREATE (:Warehouse {
     warehouse_id: row.warehouse_id,
@@ -43,9 +32,7 @@ CREATE (:Warehouse {
     capacity: toInteger(row.capacity)
 });
 
-// ----------------------
 // Create Store nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///Stores.csv' AS row
 CREATE (:Store {
     store_id: row.store_id,
@@ -54,9 +41,7 @@ CREATE (:Store {
     manager: row.manager
 });
 
-// ----------------------
 // Create Customer nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///Customers.csv' AS row
 CREATE (:Customer {
     customer_id: row.customer_id,
@@ -66,9 +51,7 @@ CREATE (:Customer {
     loyalty_no: row.loyalty_no
 });
 
-// ----------------------
 // Create PurchaseOrder nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///PurchaseOrders.csv' AS row
 CREATE (:PurchaseOrder {
     po_id: row.po_id,
@@ -78,9 +61,7 @@ CREATE (:PurchaseOrder {
     status: row.status
 });
 
-// ----------------------
 // Create SalesOrder nodes
-// ----------------------
 LOAD CSV WITH HEADERS FROM 'file:///SalesOrders.csv' AS row
 CREATE (:SalesOrder {
     so_id: row.so_id,
